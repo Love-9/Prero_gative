@@ -18,28 +18,32 @@ module.exports.renderNewForm=async (req, res) => {
     res.render("Create.ejs", { allCourses });
 }
 
-module.exports.createCoupon=async (req, res) => {
-    try {
-      // Create a new coupon
-      const newCoupon = new Coupons(req.body.Coupon);
-      let savedCoupon = await newCoupon.save();
-  
-      // Retrieve the Admin document
-      let admin = await Admin.findOne();
-  
-      // Update the Admin's coupons array
-      admin.coupons.push(savedCoupon._id);
-  
-      // Save the updated Admin document
-      await admin.save();
-  
-      res.redirect("/admin");
-    } catch (err) {
-      // Handle error
-      console.error(err);
-      res.status(500).send("Internal Server Error");
-    }
-}
+module.exports.createCoupon = async (req, res) => {
+  try {
+    // Convert the coupon name to lowercase
+    req.body.Coupon.Name = req.body.Coupon.Name.toLowerCase();
+
+    // Create a new coupon
+    const newCoupon = new Coupons(req.body.Coupon);
+    let savedCoupon = await newCoupon.save();
+
+    // Retrieve the Admin document
+    let admin = await Admin.findOne();
+
+    // Update the Admin's coupons array
+    admin.coupons.push(savedCoupon._id);
+
+    // Save the updated Admin document
+    await admin.save();
+
+    res.redirect("/admin");
+  } catch (err) {
+    // Handle error
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 
 module.exports.renderEditForm=async (req, res) => {
     let { id } = req.params;
